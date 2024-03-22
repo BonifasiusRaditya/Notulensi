@@ -85,7 +85,7 @@ int main()
             case 3:
                 hasil = open_patungan();
                 printf("Per Orang Membayar %.2f\n", hasil);
-                FILE *file = fopen("split.txt", "a");
+                FILE *file = fopen("patungan.txt", "a");
                 fprintf(file, "Biaya Per Orang: Rp %.2f\n", hasil);
                 fclose(file);
                 printf("\nPress enter to continue...");
@@ -134,7 +134,7 @@ void open_rekening(char nama_rekening[], int saldo_rekening, database pembeli[])
 {
     FILE *rek;
     int input;
-    int i = 0, n, a = 0, b = 0;
+    int i = 0, n, a = 0;
     rekening_sort sort[REKENING_MEMORY];
     char name[50];
     char nama_rekening_void[50];
@@ -157,12 +157,13 @@ void open_rekening(char nama_rekening[], int saldo_rekening, database pembeli[])
     switch(input)
     {
         case 1:
-            rek = fopen("rekening.txt", "r");
-            FILE *temp = fopen("temp_rekening.txt", "w");
             printf("Banyak Rekening: ");
             scanf("%d", &n);
             for(int i = 0; i < n; i++)
             {
+                int b = 0;
+                rek = fopen("rekening.txt", "r");
+                FILE *temp = fopen("temp_rekening.txt", "w");
                 printf("==========================\n");
                 printf("Input User ke-%d\n", i + 1);
                 printf("==========================\n");
@@ -294,7 +295,6 @@ void open_splitbill(database pembeli[], int n, int m)
     bool status;
     bool nama_aman;
     int j = 0, z;
-    int t = 0;
     float tax;
     printf("Banyak Orang: ");
     scanf("%d", &z);
@@ -306,43 +306,44 @@ void open_splitbill(database pembeli[], int n, int m)
 
     for(int c = 0; c < z; c++)
     {
-        FILE *pat = fopen("patungan.txt", "a");;
+        int t = 0;
+        FILE *pat = fopen("splitbill.txt", "a");;
         FILE *rek = fopen("rekening.txt", "r");
         FILE *temp = fopen("temp_rekening.txt", "w");
         printf("\n==========================\n");
         printf("Input Splitbill\n");
         printf("==========================\n");
         printf("Nama: ");
-        scanf("%s", pembeli[i].nama);
+        scanf("%s", pembeli[c].nama);
         printf("Beli Berapa Banyak? ");
         scanf("%d", &m);
-        fprintf(pat, "%s\n", pembeli[i].nama);
+        fprintf(pat, "%s\n", pembeli[c].nama);
         pembeli[0].result = 0;
         
             for(j = 0; j < m; j++)
             {
                 printf("Nama Pembelian ke-%d: ", j + 1);
-                scanf(" %[^\n]s", pembeli[i].list[j].nama_makanan);
+                scanf(" %[^\n]s", pembeli[c].list[j].nama_makanan);
                 printf("Harga: ");
-                scanf("%d", &(pembeli[i].list[j].harga_makanan));
-                fprintf(pat, "%s %d\n", pembeli[i].list[j].nama_makanan, pembeli[i].list[j].harga_makanan);
-                pembeli[i].result = pembeli[i].result + pembeli[i].list[j].harga_makanan;
+                scanf("%d", &(pembeli[c].list[j].harga_makanan));
+                fprintf(pat, "%s %d\n", pembeli[c].list[j].nama_makanan, pembeli[c].list[j].harga_makanan);
+                pembeli[c].result = pembeli[c].result + pembeli[c].list[j].harga_makanan;
             }
-            pembeli[i].result *= tax;
-            fprintf(pat, "Total: %d\n", pembeli[i].result);
+            pembeli[c].result *= tax;
+            fprintf(pat, "Total: %d\n", pembeli[c].result);
             fprintf(pat, "\n");
             
             while(fscanf(rek, "%s %d", sort[a].name_sort, &sort[a].nominal_sort) != EOF)
             {
-                if(strcasecmp(sort[a].name_sort, pembeli[i].nama) == 0)
+                if(strcasecmp(sort[a].name_sort, pembeli[c].nama) == 0)
                 {
-                    if(sort[a].nominal_sort > pembeli[i].result) {
+                    if(sort[a].nominal_sort > pembeli[c].result) {
                         status = true;
                     }
                     else {
                         status = false;
                     }
-                    sort[a].nominal_sort -= pembeli[i].result;
+                    sort[a].nominal_sort -= pembeli[c].result;
                     t++;
                 }
                 fprintf(temp, "%s %d\n", sort[a].name_sort, sort[a].nominal_sort);
@@ -352,9 +353,9 @@ void open_splitbill(database pembeli[], int n, int m)
         printf("==========================\n\n");
         fprintf(pat, "--------------------\n\n");
 
-        if(status == true && t == 1) printf("%s AMAN membayar %d\n", pembeli[i].nama, pembeli[i].result);
-        else if(status == false && t == 1) printf("%s BERHUTANG %d\n", pembeli[i].nama, pembeli[i].result);
-        if(t == 0) printf("%s membayar %d\n", pembeli[i].nama, pembeli[i].result);
+        if(status == true && t == 1) printf("%s AMAN membayar %d\n", pembeli[c].nama, pembeli[c].result);
+        else if(status == false && t == 1) printf("%s BERHUTANG %d\n", pembeli[c].nama, pembeli[c].result);
+        if(t == 0) printf("%s membayar %d\n", pembeli[c].nama, pembeli[c].result);
         fclose(pat);
         fclose(rek);
         fclose(temp);

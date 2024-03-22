@@ -1,3 +1,6 @@
-joko 178000
-ver 189000
-calvin 300000
+joko 282000
+ver 0
+calvin -41000
+radit 487000
+boni -1000
+tian 178000
